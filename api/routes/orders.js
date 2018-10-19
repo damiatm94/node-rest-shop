@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router(); // allows us to handle different routes etc
+const checkAuth = require('../middleware/check-auth');
 
 router.get('/', (req, res, next) => {
     res.status(200).json({

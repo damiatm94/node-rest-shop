@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); // allows us to handle different routes etc
 const Product = require('../models/product');
+const checkAuth = require('../middleware/check-auth');
 
 const mongoose = require('mongoose');
 
@@ -18,7 +19,7 @@ router.get('/', (req, res, next) => {
         });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -65,13 +66,25 @@ router.get('/:productId', (req, res, next) => {
     // id === 'special' ? res.status(200).json(specialMessage) : res.status(200).json(normalMessage);
 });
 
-router.patch('/:productId', (req, res, next) => {
-    res.status(200).json({
-        message: 'Updated product!'
-    });
+router.patch('/:productId', checkAuth, (req, res, next) => {
+    const id = req.params.productId;
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[propName] = ops.value;
+    };
+    Product.update({ _id: id }, { $set: updateOps })
+        .exec()
+        .then(result => {
+            console.log(result);
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
 });
 
-router.delete('/:productId', (req, res, next) => {
+router.delete('/:productId', checkAuth, (req, res, next) => {
     const id = req.params.productId;
     Product.remove({ _id: id })
         .exec()
@@ -79,7 +92,7 @@ router.delete('/:productId', (req, res, next) => {
             res.status(200).json(result);
         })
         .catch(err => {
-            console.log(err)
+            console.log(err);
             res.status(500).json({ error: err });
         });
 });
