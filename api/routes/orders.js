@@ -2,35 +2,14 @@ const express = require('express');
 const router = express.Router(); // allows us to handle different routes etc
 const checkAuth = require('../middleware/check-auth');
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'Orders were fetched'
-    })
-});
+const OrdersController = require('../controllers/orders');
 
-router.post('/', (req, res, next) => {
-    const order = {
-        productId: req.body.productId,
-        quantity: req.body.quantity
-    };
-    res.status(201).json({
-        message: 'Order was created',
-        order: order
-    })
-});
+router.get('/', OrdersController.orders_get_all);
 
-router.get('/:orderId', (req, res, next) => {
-    res.status(200).json({
-        message: 'Order details',
-        orderId: req.params.orderId
-    });
-});
+router.post('/', OrdersController.orders_create_order);
 
-router.delete('/:orderId', (req, res, next) => {
-    res.status(200).json({
-        message: 'Order deleted',
-        orderId: req.params.orderId
-    });
-});
+router.get('/:orderId', OrdersController.orders_get_order);
+
+router.delete('/:orderId', OrdersController.orders_delete_order);
 
 module.exports = router;
